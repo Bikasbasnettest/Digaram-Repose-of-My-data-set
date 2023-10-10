@@ -1,0 +1,32 @@
+
+#after reading the data frame in R
+require(ggplot2)
+ggplot(Bikas, aes(x = VAR, 
+                  y = LOP, 
+                  fill = VAR)) +
+  geom_boxplot(show.legend = FALSE,
+               outlier.shape = NA) +
+  geom_jitter()
+
+
+
+
+ggplot(Bikas, aes(x = VAR, y = X30DNL, fill = VAR)) +
+  geom_violin(width = .9) +  
+  geom_boxplot(width = 0.2, position = position_identity()) +  # Corrected position setting
+  labs(x = "Genotypes of the Mung bean", y = "Diameter of the Root Nodules") +
+  theme_minimal()
+# to add the Center line on data 
+library(dplyr)
+center_data<-Bikas %>%
+  group_by(VAR) %>%
+  summarize(Center = median(X30DNL))
+
+ggplot(Bikas, aes(x = VAR, y = X30DNL, fill = VAR)) +
+  geom_violin(width = 1) +
+  geom_boxplot(width = 0.6, position = position_identity()) +
+  geom_segment(data = center_data, aes(x = VAR,  xend = VAR, y = 0, yend = Center),
+               color = "black", size = 0.8, linetype = "solid") +  # Add connecting lines
+  labs(x = "Genotypes of the Mung bean", y = "Diameter of the Root Nodules") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 8))
