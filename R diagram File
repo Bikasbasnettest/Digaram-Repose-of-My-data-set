@@ -30,3 +30,16 @@ ggplot(Bikas, aes(x = VAR, y = X30DNL, fill = VAR)) +
   labs(x = "Genotypes of the Mung bean", y = "Diameter of the Root Nodules") +
   theme_minimal() +
   theme(axis.text.x = element_text(size = 8))
+#for addition of the Elipse Biplot of the two dependent and independebt variables 
+#for addiion of the Elipse Biplot of the data
+library(ggplot2)
+library(tidyverse)
+library(ggforce)
+ggplot(data = Bikas, aes(x = SPFDAAH,
+           y = GY.ha))+
+  geom_mark_ellipse(aes(color = VAR,
+                        label= VAR),
+                    expand = unit(0.5,'mm'),
+                    label.buffer = unit(-5,'mm')) + labs(x = "Genotypes of the Mung bean", y = "Sample Plant Flower Drops After Application of Hormone") +
+  geom_point(aes(color = VAR))+theme(legend.position = "bottom")
+
