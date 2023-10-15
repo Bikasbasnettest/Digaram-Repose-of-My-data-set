@@ -42,4 +42,40 @@ ggplot(data = Bikas, aes(x = SPFDAAH,
                     expand = unit(0.5,'mm'),
                     label.buffer = unit(-5,'mm')) + labs(x = "Genotypes of the Mung bean", y = "Sample Plant Flower Drops After Application of Hormone") +
   geom_point(aes(color = VAR))+theme(legend.position = "bottom")
+#for the creation of the INtegrated Box ad Viooin and DMRT mean Comparion letter and P value representation on the Plot
 
+setwd("E:/Fertility problems in Mung bean/Mung Final analysis Folder")
+Bikas<-read.csv("E:/Fertility problems in Mung bean/Mung Final analysis Folder/MFA.csv", header = TRUE)
+attach(Bikas)
+print(Bikas)
+options(max.print = 1000)
+Bikas$REP=as.factor(REP)
+Bikas$VAR=as.factor(VAR)
+library(ggplot2)
+library(dplyr)
+M<-aggregate(SPFDBAH,by=list(VAR),mean)
+require(gvlma)
+fit=lm(LOP~REP+VAR) 
+gvmodelfit=gvlma(fit) 
+gvmodelfit
+anova(lm(LOP~(REP+VAR)))
+require(agricolae)
+dmrtcomparison<-with(Bikas,duncan.test(LOP, VAR, 223 , 1.1266))      
+dmrtcomparison
+maxval<-Bikas%>%group_by(VAR)%>%summarize(mean(LOP))
+maxval
+sig.let<-dmrtcomparison$groups[order(row.names(dmrtcomparison$groups)),]
+sig.let
+#Assuming maxval is a data frame and Bikas is the main data frame
+maxval<-maxval %>% 
+  mutate(LOP = Bikas$LOP[match(maxval$VAR, Bikas$VAR)])
+maxval
+
+Pl<-ggplot(data = Bikas, aes(x = VAR, y = LOP)) +
+  geom_boxplot(aes(fill = VAR)) + geom_violin(width = .7)+
+  geom_text(data = maxval, aes(x = VAR, y = LOP + 0.6, label = sig.let$groups), vjust = 0) +
+  geom_errorbar(aes(x = VAR, ymin = LOP + 0.6 - 0.6, ymax = LOP + 0.6 + 0.6), width = 0.2) +
+  ggtitle("DMRT Mean Comparison Plot") + xlab("Genotype of Mung bean") + ylab("LOP")+stat_compare_means(method = "anova")+
+  stat_compare_means(label = "p.signif", method = "anova")
+
+Pl
