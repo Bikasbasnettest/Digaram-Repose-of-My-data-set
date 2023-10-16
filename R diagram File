@@ -87,3 +87,20 @@ P1 <- ggplot(data = Bikas, aes(x = VAR, y = RL)) +
   geom_text(aes(x = VAR[1], y = max(RL) + 1, label = paste("LSD =", round(LSD_value, 3)), hjust = 0), size = 4)
 
 P1
+#for combining the Multiple Png File.
+library(png)
+library(grid)
+library(gridExtra)
+
+# Read the images and create grobs
+img1 <- rasterGrob(readPNG("FMC_RL.png"))
+img2 <- rasterGrob(readPNG("FMCP_Root to Shoot Ratio.png"))
+img3 <- rasterGrob(readPNG("FMCP-SL.png"))
+img4 <- rasterGrob(readPNG("FMCP_Number of secondary Roots.png"))
+
+# Create a grid of images
+grid.arrange(img1, img2, img3, img4, ncol = 2)
+
+
+
+
