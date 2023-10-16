@@ -60,8 +60,18 @@ gvmodelfit=gvlma(fit)
 gvmodelfit
 anova(lm(LOP~(REP+VAR)))
 require(agricolae)
+library(ggpubr)
 dmrtcomparison<-with(Bikas,duncan.test(LOP, VAR, 223 , 1.1266))      
 dmrtcomparison
+#Given values for LSD value Getting
+MSE<-1.8849                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+n<-240  
+alpha<-0.05   
+df_error<-223 
+q_alpha<-qt(1 - alpha/2, df_error)
+LSD_value<-q_alpha * sqrt(MSE / n)
+print(LSD_value)
+
 maxval<-Bikas%>%group_by(VAR)%>%summarize(mean(LOP))
 maxval
 sig.let<-dmrtcomparison$groups[order(row.names(dmrtcomparison$groups)),]
@@ -71,11 +81,12 @@ maxval<-maxval %>%
   mutate(LOP = Bikas$LOP[match(maxval$VAR, Bikas$VAR)])
 maxval
 
-Pl<-ggplot(data = Bikas, aes(x = VAR, y = LOP)) +
+P2<-ggplot(data = Bikas, aes(x = VAR, y = RL)) +
   geom_boxplot(aes(fill = VAR)) + geom_violin(width = .7)+
-  geom_text(data = maxval, aes(x = VAR, y = LOP + 0.6, label = sig.let$groups), vjust = 0) +
-  geom_errorbar(aes(x = VAR, ymin = LOP + 0.6 - 0.6, ymax = LOP + 0.6 + 0.6), width = 0.2) +
-  ggtitle("DMRT Mean Comparison Plot") + xlab("Genotype of Mung bean") + ylab("LOP")+stat_compare_means(method = "anova")+
-  stat_compare_means(label = "p.signif", method = "anova")
+  geom_text(data = maxval, aes(x = VAR, y = RL      + 0.6, label = sig.let$groups), vjust = 0) +
+  geom_errorbar(aes(x = VAR, ymin = RL + 0.6 - 0.6, ymax = RL + 0.6 + 0.6), width = 0.2) +
+  ggtitle("DMRT Mean Comparison Plot") + xlab("Genotype of Mung bean") + ylab("RL")+stat_compare_means(method = "anova")+
+  stat_compare_means(label = "p.signif", method = "anova") +
+  geom_text(aes(x = VAR[1], y = max(RL) + 1, label = paste("LSD =", round(LSD_value, 3)), hjust = 0), size = 4)
 
-Pl
+P2
